@@ -5,16 +5,16 @@
 ## Table of Contents
 - [Problem Statement](##problem)
 - [Data Set](##dataset)
-    -[Task](###task)
-    -[Access](###access)
+    - [Task](###task)
+    - [Access](###access)
 - [Set Up and Installation](##setup)
 - [Automated ML](##automl)
-    -[Result](##automl_result)
--[Hyperparameter Tuning](##hyperdrive)
-    -[Result](##hyperdrive_result)
- -[Model Deployment](##deployment)
- -[Recreen Recording](##recording) 
- -[Standout Suggestions](##standout)
+    - [Result](##automl_result)
+- [Hyperparameter Tuning](##hyperdrive)
+    - [Result](##hyperdrive_result)
+ - [Model Deployment](##deployment)
+ - [Recreen Recording](##recording) 
+ - [Standout Suggestions](##standout)
 
 ## Problem Statement <a name="problem"></a>
 
