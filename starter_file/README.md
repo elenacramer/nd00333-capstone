@@ -37,13 +37,15 @@ Before we either apply Automated ML or tune hyperparamteres for a keras model, w
 - Create or attach a compute resource (VM with cpu for automated ML and VM with gpu for hyperdrive)
 - Load csv file and register data set in the *Dataset*
 - Initialize AutoMLConfig / HyperDriveConfig object
+- Submit experiment 
 - Save best model
 - Deploy and consume best model (either for the automated ML or hyperdrive run)
 
 
 ## Automated ML <a name="automl"></a>
 To configure the Automated ML run we need to specify what kind of a task we are dealing with, the primary metric, train and validation data sets and the target column name. Featurization is set to "auto" and to avoid overfitting we enable early stopping. 
-´´´
+
+```
 automl_setting={
     "featurization": "auto",
     "experiment_timeout_minutes": 30,
@@ -61,7 +63,7 @@ automl_config = AutoMLConfig(
     label_column_name='median_house_value', 
     **automl_setting
 )
-´´´ 
+```
 
 Here are screenshots showing the output of the `RunDetails` widget: 
 ![rund_detail1](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/run_details1.png)
@@ -79,12 +81,93 @@ This screenshot show the best model overview from the *Experiment* section:
 
 ## Hyperparameter Tuning <a name="hyperdrive"></a>
 *TODO*: What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search
+We will compare the above automl run with a deep neural network, in particular, a *keras Sequential model* with two hidden layers. We tune the following hyperparamters with HyperDrive:
+- batch size,
+- number of epochs,
+- number of units for the two hidden layers.
 
+To initialize a HyperDriveConfog class we need to specify the following:
+- Hyperparameter space: RandomParameterSampling defines a random sampling over the hyperparameter search spaces. The advantages here are that it is not so exhaustive and the lack of bias. It is a good first choice.
+```
+ps = RandomParameterSampling(
+    {
+        '--batch-size': choice(25, 50, 100),
+        '--number-epochs': choice(5,10,15),
+        '--first-layer-neurons': choice(10, 50, 200, 300, 500),
+        '--second-layer-neurons': choice(10, 50, 200, 500),
+    }
+)
+```
+- Early termination policy: BanditPolicy defines an early termination policy based on slack criteria and a frequency interval for evaluation. Any run that does ot fall within the specified slack factor (or slack amount) of the evaluation metric with respect to the best performing run will be terminated. Since our script reports metrics periodically during the execution, it makes sense to include early termination policy. Moreover, doing so avoids overfitting the training data. For more aggressive savings, we chose the Bandit Policy with a small allowable slack.
+```
+policy =  BanditPolicy(evaluation_interval=2, slack_factor=0.1, slack_amount=None, delay_evaluation=0)
+```
 
+- A ScriptRunConfig for setting up configuration for script/notebook runs (here we use the script "keras_train.py"). Since we are using a keras model, we also need to set up an environment.
+
+```
+# Evironment set up
+# conda_dependencies.yml is stored in the working directory
+
+from azureml.core import Environment
+
+keras_env = Environment.from_conda_specification(name = 'keras-2.3.1', file_path = 'conda_dependencies.yml')
+
+# Specify a GPU base image
+keras_env.docker.enabled = True
+keras_env.docker.base_image = 'mcr.microsoft.com/azureml/openmpi3.1.2-cuda10.0-cudnn7-ubuntu18.04'
+
+# ScriptrunConfig 
+src = ScriptRunConfig(source_directory=project_folder,
+                      script='keras_train.py',
+                      compute_target=compute_target,
+                      environment=keras_env)
+ ```     
+- Primary metric name and goal: The name of the primary metric reported by the experiment runs (mae) and if we wish to maximize or minimize the primary metric (minimze).
+- Max total runs and max concurrent runs : The maximum total number of runs to create and the maximum number of runs to execute concurrently. Note: the number of concurrent runs is gated on the resources available in the specified compute target. Hence ,we need to ensure that the compute target has the available resources for the desired concurrency.
+
+The HyperDriveConfig obejct:
+ ``` 
+hyperdrive_config = HyperDriveConfig(
+    hyperparameter_sampling = ps, 
+    primary_metric_name ='MAE', 
+    primary_metric_goal = PrimaryMetricGoal.MINIMIZE, 
+    max_total_runs = 8, 
+    max_concurrent_runs=4, 
+    policy=policy, 
+    run_config=src
+)
+ ``` 
+Next we submit the hyperdrive run to the experiment (i.e. launch an experiment) and show run details with the RunDeatails widget:
+ ``` 
+hyperdrive_run = experiment.submit(hyperdrive_config, show_output=True)
+RunDetails(hyperdrive_run).show()
+ ``` 
+Here is a screenshot of the RunDetails widget:
+![rundetails_hyperdrive)(https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/run_details_hyperdrive.png) 
+
+We collect and save the best model, that is, keras model with the tuned hyperparameters which yield the lowest mean absolute error:
+ ``` 
+best_run=hyperdrive_run.get_best_run_by_primary_metric()
+best_run_metrics = best_run.get_metrics()
+ ``` 
+ 
 ### Results <a name="hyperdrive_result"></a>
 *TODO*: What are the results you got with your model? What were the parameters of the model? How could you have improved it?
+Here are the results of our hyperdrive run, that is, the tuned hyperparameters:
+ ``` 
+{'Batch Size': 50,
+ 'Epochs': 15,
+ 'Loss': 5399614188.155039,
+ 'MAE': 53041.2109375}
+  ``` 
+Here is the screenshot of the best model:
+![best_model_keras](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/best_model_hyperdrive.png)
+![best_model_overview](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/best_model_overview_hyperdrive.png)
 
-*TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
+We can perhaps improve the mean absolute error score by:
+- choosing the more exhaustive Grid Sampling strategy,
+- keep the number of epochs fixed and tune the hyperparameter *learning rate* for the keras optimizer.
 
 ## Model Deployment <a name="deployment"></a>
 *TODO*: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
