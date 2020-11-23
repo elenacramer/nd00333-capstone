@@ -1,0 +1,45 @@
+Creating image
+Running.........................................................
+Failed
+More information about this error is available here: https://mlstrg127505.blob.core.windows.net/azureml/ImageLogs/8dc28d55-431a-45ab-84dc-5087331e29e5/build.log?sv=2019-02-02&sr=b&sig=Y2nscnS5yTcVLWJ7uFTl0dCmxKNL96qjm%2BjhIL%2BekgA%3D&st=2020-11-23T10%3A32%3A28Z&se=2020-12-23T10%3A37%3A28Z&sp=rl
+For more help with troubleshooting, see https://aka.ms/debugimage
+ERROR - Image creation polling reached non-successful terminal state, current state: Failed
+Error response from server:
+StatusCode: 400
+Message: Docker image build failed.
+
+---------------------------------------------------------------------------
+WebserviceException                       Traceback (most recent call last)
+<ipython-input-28-09c7f8d3919c> in <module>
+     18                                        deployment_config=aciconfig,
+     19                                        models=[model],
+---> 20                                        image_config=image_config)
+     21 
+     22 service.wait_for_deployment(show_output=True)
+
+/anaconda/envs/azureml_py36/lib/python3.6/site-packages/azureml/core/webservice/webservice.py in deploy_from_model(workspace, name, models, image_config, deployment_config, deployment_target, overwrite)
+    447 
+    448         image = Image.create(workspace, name, models, image_config)
+--> 449         image.wait_for_creation(True)
+    450         if image.creation_state != 'Succeeded':
+    451             raise WebserviceException('Error occurred creating image {} for service. More information can be found '
+
+/anaconda/envs/azureml_py36/lib/python3.6/site-packages/azureml/core/image/image.py in wait_for_creation(self, show_output)
+    452                                       'current state: {}\n'
+    453                                       'Error response from server:\n'
+--> 454                                       '{}'.format(self.creation_state, error_response), logger=module_logger)
+    455 
+    456         print('Image creation operation finished for image {}, operation "{}"'.format(self.id, operation_state))
+
+WebserviceException: WebserviceException:
+	Message: Image creation polling reached non-successful terminal state, current state: Failed
+Error response from server:
+StatusCode: 400
+Message: Docker image build failed.
+	InnerException None
+	ErrorResponse 
+{
+    "error": {
+        "message": "Image creation polling reached non-successful terminal state, current state: Failed\nError response from server:\nStatusCode: 400\nMessage: Docker image build failed."
+    }
+}
