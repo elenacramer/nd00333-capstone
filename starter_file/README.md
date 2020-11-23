@@ -31,15 +31,50 @@ Our objective is to build prediction models that predict the housing prices from
 We downloaded the *housing.csv* from kaggle localy to the virtual machine and uploaded the csv file in the *Dataset* section. 
 
 ## Project Set Up and Installation <a name="setup"></a>
-*OPTIONAL:* If your project has any special installation steps, this is where you should put it. To turn this project into a professional portfolio project, you are encouraged to explain how to set up this project in AzureML.
+Before we either apply Automated ML or tune hyperparamteres for a keras model, we need to the following steps:
+- Import all needed dependencies
+- Set up a Workspace and initialize an experiment
+- Create or attach a compute resource (VM with cpu for automated ML and VM with gpu for hyperdrive)
+- Load csv file and register data set in the *Dataset*
+- Initialize AutoMLConfig / HyperDriveConfig object
+- Save best model
+- Deploy and consume best model (either for the automated ML or hyperdrive run)
 
 
 ## Automated ML <a name="automl"></a>
-*TODO*: Give an overview of the `automl` settings and configuration you used for this experiment
+To configure the Automated ML run we need to specify what kind of a task we are dealing with, the primary metric, train and validation data sets and the target column name. Featurization is set to "auto" and to avoid overfitting we enable early stopping. 
+´´´
+automl_setting={
+    "featurization": "auto",
+    "experiment_timeout_minutes": 30,
+    "enable_early_stopping": True,
+    "verbosity": logging.INFO,
+    "compute_target": compute_target
+}
+
+task="regression" 
+automl_config = AutoMLConfig( 
+    task=task, 
+    primary_metric='normalized_root_mean_squared_error', 
+    training_data=train, 
+    validation_data = test, 
+    label_column_name='median_house_value', 
+    **automl_setting
+)
+´´´ 
+
+Here are screenshots showing the output of the `RunDetails` widget: 
+![rund_detail1](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/run_details1.png)
+![run_details2](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/run_details2.png)
 
 ### Results <a name="automl_result"></a>
-*TODO*: What are the results you got with your automated ML model? What were the parameters of the model? How could you have improved it?
+The best model from the automated ML run is *LightGBM* with mean absolute error (mae) of 32.376,38. Automated ML applied a MaxAbsScaler. 
 
+The following screenshots shows the best run ID and mae:
+![best_model](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model_automl.png)
+
+This screenshot show the best model overview from the *Experiment* section:
+![best_model_overview](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model_overview.png)
 *TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
 
 ## Hyperparameter Tuning <a name="hyperdrive"></a>
