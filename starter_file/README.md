@@ -17,7 +17,6 @@
  - [Standout Suggestions](##standout)
 
 ## Problem Statement <a name="problem"></a>
-
 In this project we will consider a regression problem, i.e. a process where a model learns to predict a continuous value output for a given input data). We first apply AutoML where multiple models are trained to fit the training data. We then choose and save the best model, that is, the model with the best score. Secondly, we build a simple neural network consisting of two hidden layers. In particular, a keras model where we tune hyperparameters using HyperDrive.  
 
 
@@ -30,7 +29,7 @@ Our objective is to build prediction models that predict the housing prices from
 ### Access <a name="access"></a>
 We downloaded the *housing.csv* from kaggle localy to the virtual machine and uploaded the csv file in the *Dataset* section. 
 
-## Project Set Up and Installation <a name="setup"></a>
+## General Set Up <a name="setup"></a>
 Before we either apply Automated ML or tune hyperparamteres for a keras model, we need to the following steps:
 - Import all needed dependencies
 - Set up a Workspace and initialize an experiment
@@ -43,8 +42,7 @@ Before we either apply Automated ML or tune hyperparamteres for a keras model, w
 
 
 ## Automated ML <a name="automl"></a>
-To configure the Automated ML run we need to specify what kind of a task we are dealing with, the primary metric, train and validation data sets and the target column name. Featurization is set to "auto" and to avoid overfitting we enable early stopping. 
-
+To configure the Automated ML run we need to specify what kind of a task we are dealing with, the primary metric, train and validation data sets (which are in *TabularDataset*  form) and the target column name. Featurization is set to "auto", meaning that the featurization step should be done automatically. To avoid overfitting we enable early stopping. 
 ```
 automl_setting={
     "featurization": "auto",
@@ -77,10 +75,11 @@ The following screenshots shows the best run ID and mae:
 
 This screenshot show the best model overview from the *Experiment* section:
 ![best_model_overview](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model_overview.png)
-*TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
+
+We can perhaps improve the model by using customized featurization by passing a FeaturizationConfig object to the featurization parameter of the AutoMLConfig class. This, for example, enables us to choose a particular encoder for the categorical variables, a strategy to impute missing values, ect..
+
 
 ## Hyperparameter Tuning <a name="hyperdrive"></a>
-*TODO*: What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search
 We will compare the above automl run with a deep neural network, in particular, a *keras Sequential model* with two hidden layers. We tune the following hyperparamters with HyperDrive:
 - batch size,
 - number of epochs,
@@ -144,7 +143,7 @@ hyperdrive_run = experiment.submit(hyperdrive_config, show_output=True)
 RunDetails(hyperdrive_run).show()
  ``` 
 Here is a screenshot of the RunDetails widget:
-![rundetails_hyperdrive)(https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/run_details_hyperdrive.png) 
+![rundetails_hyperdrive](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/run_details_hyperdrive.png) 
 
 We collect and save the best model, that is, keras model with the tuned hyperparameters which yield the lowest mean absolute error:
  ``` 
@@ -153,7 +152,6 @@ best_run_metrics = best_run.get_metrics()
  ``` 
  
 ### Results <a name="hyperdrive_result"></a>
-*TODO*: What are the results you got with your model? What were the parameters of the model? How could you have improved it?
 Here are the results of our hyperdrive run, that is, the tuned hyperparameters:
  ``` 
 {'Batch Size': 50,
