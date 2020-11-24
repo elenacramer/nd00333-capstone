@@ -63,9 +63,20 @@ automl_config = AutoMLConfig(
 )
 ```
 
-Here are screenshots showing the output of the `RunDetails` widget: 
+Next we submit the hyperdrive run to the experiment (i.e. launch an experiment) and show run details with the RunDeatails widget:
+ ``` 
+hyperdrive_run = experiment.submit(hyperdrive_config, show_output=True)
+RunDetails(hyperdrive_run).show()
+ ``` 
+Screenshots of the RunDetails widget:
 ![rund_detail1](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/automl_run.png)
 ![run_details2](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/autml_run2.png)
+
+We collect and save the best model, that is, keras model with the tuned hyperparameters which yield the lowest mean absolute error:
+ ``` 
+best_run=hyperdrive_run.get_best_run_by_primary_metric()
+best_run_metrics = best_run.get_metrics()
+ ``` 
 
 ### Results <a name="automl_result"></a>
 The best model from the automated ML run is *LightGBM* with mean absolute error (mae) of 32.376,38. Automated ML applied a MaxAbsScaler. 
@@ -139,7 +150,7 @@ Next we submit the hyperdrive run to the experiment (i.e. launch an experiment) 
 hyperdrive_run = experiment.submit(hyperdrive_config, show_output=True)
 RunDetails(hyperdrive_run).show()
  ``` 
-Here is a screenshot of the RunDetails widget:
+Screenshot of the RunDetails widget:
 ![rundetails_hyperdrive](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/run_details_hyperdrive.png) 
 
 We collect and save the best model, that is, keras model with the tuned hyperparameters which yield the lowest mean absolute error:
