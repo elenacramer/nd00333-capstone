@@ -1,6 +1,4 @@
-*NOTE:* This file is a template that you can use to create the README for your project. The *TODO* comments below will highlight the information you should be sure to include.
-
-# Your Project Title Here
+# Train and Deploy Models with Azure ML
 
 ## Table of Contents
 - [Problem Statement](##problem)
@@ -17,24 +15,24 @@
  - [Standout Suggestions](##standout)
 
 ## Problem Statement <a name="problem"></a>
-In this project we will consider a regression problem, i.e. a process where a model learns to predict a continuous value output for a given input data). We first apply AutoML where multiple models are trained to fit the training data. We then choose and save the best model, that is, the model with the best score. Secondly, we build a simple neural network consisting of two hidden layers. In particular, a keras model where we tune hyperparameters using HyperDrive.  
+In this project we will consider a regression problem, i.e. a process where a model learns to predict a continuous value output for a given input data. We first apply AutoML where multiple models are trained to fit the training data. We then choose and save the best model, that is, the model with the best score. Secondly, we build a simple neural network consisting of two hidden layers. In particular, a keras model where we tune hyperparameters using HyperDrive.  
 
 
 ## Dataset  <a name="dataset"></a>
 In this project we consider the *California housing* data set from [kaggle](https://www.kaggle.com/camnugent/california-housing-prices). The data contains information from the 1990 California census. So although it may not help us with predicting current housing prices, we chose the data set because it requires rudimentary data cleaning, has an easily understandable list of variables and sits at an optimal size between being to toyish and too cumbersome. This enables us to focus on all required configuration to work with Azure ML. 
 
 ### Task  <a name="task"></a>
-Our objective is to build prediction models that predict the housing prices from the set of given house features. Thus our task is a regression problem (a process where a model learns to predict a continuous value output for a given input data). 
+Our objective is to build prediction models that predict the housing prices from the set of given house features.
 
 ### Access <a name="access"></a>
-We downloaded the *housing.csv* from kaggle localy to the virtual machine and uploaded the csv file to the Azure ML platform.
+We download the *housing.csv* from kaggle localy and upload the csv file to the Azure ML platform.
 
 ## General Set Up <a name="setup"></a>
-Before we either apply Automated ML or tune hyperparamteres for a keras model, we need to the following steps:
+Before we either apply Automated ML or tune hyperparamteres for a keras model, the following steps are required:
 - Import all needed dependencies
 - Set up a Workspace and initialize an experiment
 - Create or attach a compute resource (VM with cpu for automated ML and VM with gpu for hyperdrive)
-- Load csv file and register data set in the *Dataset*
+- Load csv file and either register data set in the *Dataset* section or read directly to the notebook
 - Initialize AutoMLConfig / HyperDriveConfig object
 - Submit experiment 
 - Save best model
@@ -65,8 +63,8 @@ automl_config = AutoMLConfig(
 
 Next we submit the hyperdrive run to the experiment (i.e. launch an experiment) and show run details with the RunDeatails widget:
  ``` 
-hyperdrive_run = experiment.submit(hyperdrive_config, show_output=True)
-RunDetails(hyperdrive_run).show()
+automl_run = experiment.submit(automl_config, show_output=True)
+RunDetails(automl_run).show()
  ``` 
 Screenshots of the RunDetails widget:
 ![rund_detail1](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/automl_run.png)
@@ -77,9 +75,10 @@ We collect and save the best model, that is, keras model with the tuned hyperpar
 best_run=hyperdrive_run.get_best_run_by_primary_metric()
 best_run_metrics = best_run.get_metrics()
  ``` 
+For a complete code overview, we refer to the jypter notebook *automl.ipynb*.
 
 ### Results <a name="automl_result"></a>
-The best model from the automated ML run is *LightGBM* with mean absolute error (mae) of 32.376,38. Automated ML applied a MaxAbsScaler. 
+The best model from the automated ML run is *LightGBM* with mean absolute error (mae) of 32.376,38. 
 
 The following screenshots shows the best run ID and mae:
 ![best_model](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model.png)
@@ -100,8 +99,8 @@ ps = RandomParameterSampling(
     {
         '--batch-size': choice(25, 50, 100),
         '--number-epochs': choice(5,10,15),
-        '--first-layer-neurons': choice(10, 50, 200, 300, 500),
-        '--second-layer-neurons': choice(10, 50, 200, 500),
+        '--first-layer-neurons': choice(range(2,12,2)),
+        '--second-layer-neurons': choice(range(2,12,2))
     }
 )
 ```
@@ -151,7 +150,7 @@ hyperdrive_run = experiment.submit(hyperdrive_config, show_output=True)
 RunDetails(hyperdrive_run).show()
  ``` 
 Screenshot of the RunDetails widget:
-![rundetails_hyperdrive](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/run_details_hyperdrive.png) 
+![rundetails_hyperdrive](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/screenshots/hyperdrive_run_completed.png) 
 
 We collect and save the best model, that is, keras model with the tuned hyperparameters which yield the lowest mean absolute error:
  ``` 
@@ -160,29 +159,94 @@ best_run_metrics = best_run.get_metrics()
  ``` 
  
 ### Results <a name="hyperdrive_result"></a>
-Here are the results of our hyperdrive run, that is, the tuned hyperparameters:
+Here are the results of our hyperdrive run, that is, the tuned hyperparameters and mean absolute error:
  ``` 
-{'Batch Size': 50,
- 'Epochs': 15,
- 'Loss': 5399614188.155039,
- 'MAE': 53041.2109375}
+{'Batch Size': 25,
+ 'Epochs': 10,
+ 'First hidden layer': 4,
+ 'Second hidden layer': 4,
+ 'Loss': 50654265725.023254,
+ 'MAE': 193928.734375}
   ``` 
 Here is the screenshot of the best model:
-![best_model_keras](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/best_model_hyperdrive.png)
-![best_model_overview](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/best_model_overview_hyperdrive.png)
+![best_model_keras](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/screenshots/best_model_hyperdirve.png)
 
 We can perhaps improve the mean absolute error score by:
 - choosing the more exhaustive Grid Sampling strategy,
 - keep the number of epochs fixed and tune the hyperparameter *learning rate* for the keras optimizer.
 
 ## Model Deployment <a name="deployment"></a>
-*TODO*: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
+The keras model with the tuned hyperparameters archieved a better score, that is, a lower mean absolute error, thus we will deploy that model. To do so, we need to:
+- Create a scoring script that will be invoked by the web service call (see *scoring.py*). Note that the scoring script must have two required functions, init() and run(input_data).
+    - In init() function, you typically load the model into a global object. This function is executed only once when the Docker container is started.
+    - In run(input_data) function, the model is used to predict a value based on the input data. The input and output to run typically use JSON as serialization and de-serialization format but you are not limited to that.
+- Create an environment file so that Azure Machine Learning can install the necessary packages in the Docker image which are required by your scoring script. In this case, we need to specify conda packages tensorflow and keras (see *myenv.yml*).
+
+- Create the inference configuration and deployment configuration and deploy to ACI. 
+```
+from azureml.core.webservice import AciWebservice
+from azureml.core.model import InferenceConfig
+from azureml.core.model import Model
+from azureml.core.environment import Environment
+
+
+myenv = Environment.from_conda_specification(name="myenv", file_path="myenv.yml")
+inference_config = InferenceConfig(entry_script="scoring.py", environment=myenv)
+
+aciconfig = AciWebservice.deploy_configuration(cpu_cores=1,
+                                               auth_enabled=True, # this flag generates API keys to secure access
+                                               memory_gb=1,
+                                               tags={'name': 'housing', 'framework': 'Keras'},
+                                               description='Keras MLP on california housing')
+
+service = Model.deploy(workspace=ws, 
+                           name='keras-housing-svc', 
+                           models=[model], 
+                           inference_config=inference_config, 
+                           deployment_config=aciconfig)
+
+service.wait_for_deployment(True)
+print(service.state)
+```
+After a successfull deployment we can access the scoring uri with:
+```
+print(service.scoring_uri)
+```
+![model_deployed](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/screenshots/keras_model_deployed_healthy.png)
+
+We can test the deployed model. We pick the first 5 samples from the test set, and send it to the web service hosted in ACI. We note here that we are using the run API in the SDK to invoke the service (we can also make raw HTTP calls using any HTTP tool such as curl).
+```
+import json
+
+test_s=x_test[:5].tolist()
+test_samples = json.dumps({"data": test_s})
+test_samples = bytes(test_samples, encoding='utf8')
+
+# predict using the deployed model
+result = service.run(input_data=test_samples)
+
+from sklearn.metrics import mean_absolute_error
+mae_test = mean_absolute_error(y_test[:5], np.array(result))
+print(round(mae_test, 3))
+```
+We can have a look at the workspace after the web service was deployed: 
+```
+
+model = ws.models['keras-housing']
+print("Model: {}, ID: {}".format('keras-housing', model.id))
+    
+webservice = ws.webservices['keras-housing-svc']
+print("Webservice: {}, scoring URI: {}".format('keras-housing-svc', webservice.scoring_uri))
+```
+```
+Model: keras-housing, ID: keras-housing:2
+Webservice: keras-housing-svc, scoring URI: http://d16dbe64-9b27-48b9-9cf8-3bc605fec3c7.southcentralus.azurecontainer.io/score
+```
+At the end we delete the ACI deployment as well as the compute cluster:
+![clean_up](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/screenshots/clean_up.png)
 
 ## Screen Recording  <a name="recording"></a>
-*TODO* Provide a link to a screen recording of the project in action. Remember that the screencast should demonstrate:
-- A working model
-- Demo of the deployed  model
-- Demo of a sample request sent to the endpoint and its response
+[Screencast](https://youtu.be/05gfBcdG8OQ)
 
 ## Standout Suggestions <a name="standout"></a>
 *TODO (Optional):* This is where you can provide information about any standout suggestions that you have attempted.
