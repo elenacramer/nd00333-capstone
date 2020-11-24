@@ -175,14 +175,14 @@ We can perhaps improve the mean absolute error score by:
 - choosing the more exhaustive Grid Sampling strategy,
 - keep the number of epochs fixed and tune the hyperparameter *learning rate* for the keras optimizer.
 
-## Model Deployment <a name="deployment"></a>
+## Deploy Model to ACI <a name="deployment"></a>
 The keras model with the tuned hyperparameters archieved a better score, that is, a lower mean absolute error, thus we will deploy that model. To do so, we need to:
-- Create a scoring script that will be invoked by the web service call (see *scoring.py*). Note that the scoring script must have two required functions, init() and run(input_data).
-    - In init() function, you typically load the model into a global object. This function is executed only once when the Docker container is started.
-    - In run(input_data) function, the model is used to predict a value based on the input data. The input and output to run typically use JSON as serialization and de-serialization format but you are not limited to that.
-- Create an environment file so that Azure Machine Learning can install the necessary packages in the Docker image which are required by your scoring script. In this case, we need to specify conda packages tensorflow and keras (see *myenv.yml*).
+- Create a *scoring script* that will be invoked by the web service call (see *scoring.py*). Note that the scoring script must have two required functions, *init()* and *run(input_data)*.
+    - An init() function: typically loads the model into a global object. This function is executed only once when the Docker container is started.
+    - An run(input_data) function: the model is used to predict a value based on the input data. The input and output to run typically use JSON as serialization and de-serialization format (it is not limited to that).
+- Create an *environment file* so that Azure Machine Learning can install the necessary packages in the Docker image which are required by your scoring script. In this case, we need to specify conda packages tensorflow and keras (see *myenv.yml*).
 
-- Create the inference configuration and deployment configuration and deploy to ACI. 
+- Create the *inference configuration* and *deployment configuration* and deploy to ACI. 
 ```
 from azureml.core.webservice import AciWebservice
 from azureml.core.model import InferenceConfig
