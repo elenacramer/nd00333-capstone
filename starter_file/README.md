@@ -27,7 +27,7 @@ In this project we consider the *California housing* data set from [kaggle](http
 Our objective is to build prediction models that predict the housing prices from the set of given house features. Thus our task is a regression problem (a process where a model learns to predict a continuous value output for a given input data). 
 
 ### Access <a name="access"></a>
-We downloaded the *housing.csv* from kaggle localy to the virtual machine and uploaded the csv file in the *Dataset* section. 
+We downloaded the *housing.csv* from kaggle localy to the virtual machine and uploaded the csv file to the Azure ML platform.
 
 ## General Set Up <a name="setup"></a>
 Before we either apply Automated ML or tune hyperparamteres for a keras model, we need to the following steps:
@@ -64,17 +64,14 @@ automl_config = AutoMLConfig(
 ```
 
 Here are screenshots showing the output of the `RunDetails` widget: 
-![rund_detail1](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/run_details1.png)
-![run_details2](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/run_details2.png)
+![rund_detail1](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/automl_run.png)
+![run_details2](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/autml_run2.png)
 
 ### Results <a name="automl_result"></a>
 The best model from the automated ML run is *LightGBM* with mean absolute error (mae) of 32.376,38. Automated ML applied a MaxAbsScaler. 
 
 The following screenshots shows the best run ID and mae:
-![best_model](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model_automl.png)
-
-This screenshot show the best model overview from the *Experiment* section:
-![best_model_overview](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model_overview.png)
+![best_model](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model.png)
 
 We can perhaps improve the model by using customized featurization by passing a FeaturizationConfig object to the featurization parameter of the AutoMLConfig class. This, for example, enables us to choose a particular encoder for the categorical variables, a strategy to impute missing values, ect..
 
