@@ -55,6 +55,8 @@ input_shape=(x_train.shape[1],)
 
 run.log('Batch Size', batch_size)
 run.log('Epochs', n_epochs)
+run.log('First hidden layer', n_hidden_1)
+run.log('Second hidden layer', n_hidden_2)
 
 #  MLP model with 2 hidden layers
 model = Sequential()
