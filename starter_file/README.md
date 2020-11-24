@@ -249,4 +249,4 @@ At the end we delete the ACI deployment as well as the compute cluster:
 [Screencast](https://youtu.be/05gfBcdG8OQ)
 
 ## Standout Suggestions <a name="standout"></a>
-*TODO (Optional):* This is where you can provide information about any standout suggestions that you have attempted.
+(**Optional**)
