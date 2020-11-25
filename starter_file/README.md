@@ -237,9 +237,23 @@ print(round(mae_test, 3))
 ```
 We can now send construct raw HTTP request and send to the service. Todo so, we need to add a key to the HTTP header:
 ```
+import requests
 
+key1, Key2 = service.get_keys()
+
+# send a random row from the test set to score
+random_index = np.random.randint(0, len(x_test)-1)
+input_data = "{\"data\": [" + str(list(x_test[random_index])) + "]}"
+
+headers = {'Content-Type':'application/json', 'Authorization': 'Bearer ' + key1}
+
+resp = requests.post(service.scoring_uri, input_data, headers=headers)
+
+print("POST to url", service.scoring_uri)
+#print("input data:", input_data)
+print("label:", y_test[random_index])
+print("prediction:", resp.text)
 ```
-
 
 We can have a look at the workspace after the web service was deployed: 
 ```
