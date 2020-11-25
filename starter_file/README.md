@@ -235,6 +235,12 @@ from sklearn.metrics import mean_absolute_error
 mae_test = mean_absolute_error(y_test[:5], np.array(result))
 print(round(mae_test, 3))
 ```
+We can now send construct raw HTTP request and send to the service. Todo so, we need to add a key to the HTTP header:
+```
+
+```
+
+
 We can have a look at the workspace after the web service was deployed: 
 ```
 
