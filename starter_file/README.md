@@ -83,8 +83,10 @@ The best model from the automated ML run is *LightGBM* with mean absolute error 
 The following screenshots shows the best run ID and mae:
 ![best_model](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model.png)
 
-We can perhaps improve the model by using customized featurization by passing a FeaturizationConfig object to the featurization parameter of the AutoMLConfig class. This, for example, enables us to choose a particular encoder for the categorical variables, a strategy to impute missing values, ect..
-
+### Thoughts about improvement 
+Two thoughts of how we we can perhaps improve the model:
+- Use customized featurization by passing a *FeaturizationConfig* object to the featurization parameter of the AutoMLConfig class. This, for example, enables us to choose a particular encoder for the categorical variables, a strategy to impute missing values, ect..
+- *LightGBM* is a fast, distributed, high-performance gradient-boosting framework based on decision tree algorithms. We can experiment with different configurations of the model, that is, tune some of the hyperparameters such as *num_leaves*, *learning_rate*, *feature_fraction*,... .
 
 ## Hyperparameter Tuning <a name="hyperdrive"></a>
 We will compare the above automl run with a deep neural network, in particular, a *keras Sequential model* with two hidden layers. We tune the following hyperparamters with HyperDrive:
@@ -171,9 +173,11 @@ Here are the results of our hyperdrive run, that is, the tuned hyperparameters a
 Here is the screenshot of the best model:
 ![best_model_keras](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/screenshots/best_model_hyperdirve.png)
 
+### Thoughts about improvement 
 We can perhaps improve the mean absolute error score by:
-- choosing the more exhaustive Grid Sampling strategy,
-- keep the number of epochs fixed and tune the hyperparameter *learning rate* for the keras optimizer.
+- choosing the more exhaustive *Grid Sampling strategy*,
+- keeping, for example, the number of epochs fixed and tune the hyperparameter *learning rate* for the keras optimizer *adam*,
+- choosing a different number of hidden layers, i.e. tune the number of hidden layers as well.
 
 ## Deploy Model to ACI <a name="deployment"></a>
 The keras model with the tuned hyperparameters archieved a better score, that is, a lower mean absolute error, thus we will deploy that model. To do so, we need to:
