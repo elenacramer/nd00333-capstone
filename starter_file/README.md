@@ -8,8 +8,10 @@
 - [Set Up and Installation](##setup)
 - [Automated ML](##automl)
     - [Result](##automl_result)
+    - [Thoughts about Improvement](##automl_improve)
 - [Hyperparameter Tuning](##hyperdrive)
     - [Result](##hyperdrive_result)
+    - [Thoughts about Improvement](##hyperdrive_improve)
  - [Model Deployment](##deployment)
  - [Recreen Recording](##recording) 
  - [Standout Suggestions](##standout)
@@ -83,7 +85,7 @@ The best model from the automated ML run is *LightGBM* with mean absolute error 
 The following screenshots shows the best run ID and mae:
 ![best_model](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/automated_ml/screenshots/best_model.png)
 
-### Thoughts about improvement 
+### Thoughts about improvement <a name="automl_imrpove"></a>
 Two thoughts of how we we can perhaps improve the model:
 - Use customized featurization by passing a *FeaturizationConfig* object to the featurization parameter of the AutoMLConfig class. This, for example, enables us to choose a particular encoder for the categorical variables, a strategy to impute missing values, ect..
 - *LightGBM* is a fast, distributed, high-performance gradient-boosting framework based on decision tree algorithms. We can experiment with different configurations of the model, that is, tune some of the hyperparameters such as *num_leaves*, *learning_rate*, *feature_fraction*,... .
@@ -173,7 +175,7 @@ Here are the results of our hyperdrive run, that is, the tuned hyperparameters a
 Here is the screenshot of the best model:
 ![best_model_keras](https://github.com/elenacramer/nd00333-capstone/blob/master/starter_file/hyperdrive_keras_model/screenshots/best_model_hyperdirve.png)
 
-### Thoughts about improvement 
+### Thoughts about improvement <a name="hyperdrive_improve"></a>
 We can perhaps improve the mean absolute error score by:
 - choosing the more exhaustive *Grid Sampling strategy*,
 - keeping, for example, the number of epochs fixed and tune the hyperparameter *learning rate* for the keras optimizer *adam*,
